@@ -1,0 +1,35 @@
+{
+  "name": "level-net-server",
+  "version": "0.0.1",
+  "description": "LevelDB database exposed as a TCP server",
+  "main": "index.js",
+  "directories": {
+    "test": "tests"
+  },
+  "scripts": {
+    "test": "tap tests/*.test.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/pgte/level-net-server.git"
+  },
+  "keywords": [
+    "leveldb",
+    "server"
+  ],
+  "author": "pgte",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/pgte/level-net-server/issues"
+  },
+  "dependencies": {
+    "duplex-emitter": "~2.0.3"
+  },
+  "devDependencies": {
+    "tap": "*",
+    "level": "*",
+    "duplexer": "*",
+    "mkdirp": "*",
+    "level-net-client": "*"
+  }
+}

@@ -1,6 +1,6 @@
 # level-net-server
 
-> LevelDB database exposed as a TCP server.
+> LevelDB database exposed as a TCP server
 
 ## Install
 
