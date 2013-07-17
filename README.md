@@ -1,5 +1,7 @@
 # level-net-server
 
+[![Build Status](https://travis-ci.org/pgte/level-net-server.png)](https://travis-ci.org/pgte/level-net-server)
+
 > LevelDB database exposed as a TCP server
 
 ## Install
