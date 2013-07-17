@@ -1,10 +1,10 @@
 # level-net-server
 
+> LevelDB database exposed as a TCP server
+
 [![Build Status](https://travis-ci.org/pgte/level-net-server.png)](https://travis-ci.org/pgte/level-net-server)
 
 ![NPM status](https://nodei.co/npm/level-net-server.png)
-
-> LevelDB database exposed as a TCP server
 
 ## Install
 
