@@ -91,19 +91,19 @@ function onWrite(requestId, what) {
   if (! stream) {
     error.call(this, requestId, new Error('Stream not found'));
   } else {
-    stream.write(what);
+    var flushed = stream.write(what);
 
     // PENDING: should only send ack
     // when write is acknowledged
-    process.nextTick(onReady.bind(this));
+    if (flushed) {
+      process.nextTick(onDrain.bind(this));
+    } else {
+      stream.once('drain', onDrain.bind(this));
+    }
 
-    //stream.once('drain', onDrain.bind(this));
   }
 
-  // function onDrain() {
-  //   this._emitter.emit('ack', requestId);
-  // }
-  function onReady() {
+  function onDrain() {
     this._emitter.emit('ack', requestId);
   }
 }

@@ -18,7 +18,7 @@ test('removes and creates db', function(t) {
   } catch(_) {}
 
   require('mkdirp').sync(dir);
-  db = level(dir, { createIfMissing: true });
+  db = level(dir, { createIfMissing: true, maxBufferLength: 1 });
 
   db.once('ready', function() {
     t.end();
