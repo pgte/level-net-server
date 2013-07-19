@@ -1,6 +1,6 @@
 {
   "name": "level-net-server",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "LevelDB database exposed as a TCP server",
   "main": "index.js",
   "directories": {
