@@ -1,7 +1,7 @@
 var EventEmitter = require('events').EventEmitter;
 var inherits = require('util').inherits;
-
 var DuplexEmitter = require('duplex-emitter');
+var LevelWriteStream = require('level-writestream');
 
 module.exports =
 function createPeer(stream, db) {
@@ -16,6 +16,7 @@ function Peer(stream, db) {
 
   this._streams = {};
 
+  LevelWriteStream(db);
   this.db = db;
 
   emitter.on('put', onPut.bind(this));
@@ -32,41 +33,42 @@ inherits(Peer, EventEmitter);
 /// put
 
 function onPut(requestId, key, value) {
-  this.db.put(key, value, onPut.bind(this));
-
-  function onPut(err) {
-    if (err) error.call(this, err, requestId);
-    else this._emitter.emit('ok', requestId);
-  }
+  this.db.put(key, value, onPutted.bind(this, requestId));
 }
+
+function onPutted(requestId, err) {
+  if (err) error.call(this, err, requestId);
+  else this._emitter.emit('ok', requestId);
+}
+
 
 
 /// get
 
 function onGet(requestId, key) {
-  this.db.get(key, onGet.bind(this));
-
-  function onGet(err, value) {
-    if (err) error.call(this, err, requestId);
-    else this._emitter.emit('got', requestId, value);
-  }
+  this.db.get(key, onGot.bind(this, requestId));
 };
+
+function onGot(requestId, err, value) {
+  if (err) error.call(this, err, requestId);
+  else this._emitter.emit('got', requestId, value);
+}
 
 
 /// read
 
 function onRead(requestId, options) {
   var readStream = this.db.createReadStream(options);
-  readStream.on('data', onData.bind(this));
-  readStream.once('end', onEnd.bind(this));
+  readStream.on('data', onReadData.bind(this, requestId));
+  readStream.once('end', onReadEnd.bind(this, requestId));
+}
 
-  function onData(d) {
-    this._emitter.emit('data', requestId, d);
-  }
+function onReadData(requestId, d) {
+  this._emitter.emit('data', requestId, d);
+}
 
-  function onEnd(d) {
-    this._emitter.emit('end', requestId);
-  }
+function onReadEnd(requestId, d) {
+  this._emitter.emit('end', requestId);
 }
 
 
@@ -75,12 +77,12 @@ function onRead(requestId, options) {
 function onWriteStream(requestId, options) {
   var writeStream = this.db.createWriteStream(options);
   this._streams[requestId] = writeStream;
-  writeStream.once('close', onClose.bind(this));
+  writeStream.once('close', onWriteClose.bind(this, requestId));
+}
 
-  function onClose() {
-    this._emitter.emit('close', requestId);
-    delete this._streams[requestId];
-  }
+function onWriteClose(requestId) {
+  this._emitter.emit('close', requestId);
+  delete this._streams[requestId];
 }
 
 
@@ -91,21 +93,12 @@ function onWrite(requestId, what) {
   if (! stream) {
     error.call(this, requestId, new Error('Stream not found'));
   } else {
-    var flushed = stream.write(what);
-
-    // PENDING: should only send ack
-    // when write is acknowledged
-    if (flushed) {
-      process.nextTick(onDrain.bind(this));
-    } else {
-      stream.once('drain', onDrain.bind(this));
-    }
-
+    stream.write(what, onWrote.bind(this, requestId));
   }
+}
 
-  function onDrain() {
-    this._emitter.emit('ack', requestId);
-  }
+function onWrote(requestId) {
+  this._emitter.emit('ack', requestId);
 }
 
 
@@ -119,6 +112,7 @@ function onEnd(requestId, what) {
     stream.end(what);
   }
 }
+
 
 // error
 

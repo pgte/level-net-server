@@ -15,6 +15,7 @@
   },
   "keywords": [
     "leveldb",
+    "tcp",
     "server"
   ],
   "author": "pgte",
@@ -23,7 +24,8 @@
     "url": "https://github.com/pgte/level-net-server/issues"
   },
   "dependencies": {
-    "duplex-emitter": "~2.0.3"
+    "duplex-emitter": "~2.0.3",
+    "level-writestream": "~0.1.0"
   },
   "devDependencies": {
     "tap": "*",
