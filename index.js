@@ -28,7 +28,13 @@ DBServer.prototype.listen = function listen(port, host, cb) {
     host = undefined;
   }
   var server = this._getServer();
-  server.listen(port, host, cb);
+
+  server.once('listening', function() {
+    this.emit('listening');
+    if (cb) cb();
+  }.bind(this));
+
+  server.listen(port, host);
 };
 
 
